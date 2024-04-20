@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 authors = ["Axlefublr"]
 license = "MIT"
-description = ""
+description = "File location storer, designed to be called from neovim."
 readme = "README.md"
 homepage = "https://github.com/Axlefublr/harp"
 repository = "https://github.com/Axlefublr/harp"
@@ -13,3 +13,7 @@ repository = "https://github.com/Axlefublr/harp"
 unescaped_backticks = "deny"
 
 [dependencies]
+clap = { version = "4.5.4", features = ["wrap_help", "derive"] }
+dirs = "5.0.1"
+serde = { version = "1.0.198", features = ["derive"] }
+serde_yaml = "0.9.34"
