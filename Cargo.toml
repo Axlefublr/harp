@@ -1,0 +1,15 @@
+[package]
+name = "harp"
+version = "0.0.1"
+edition = "2021"
+authors = ["Axlefublr"]
+license = "MIT"
+description = ""
+readme = "README.md"
+homepage = "https://github.com/Axlefublr/harp"
+repository = "https://github.com/Axlefublr/harp"
+
+[lints.rustdoc]
+unescaped_backticks = "deny"
+
+[dependencies]
