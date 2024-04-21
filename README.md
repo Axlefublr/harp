@@ -128,6 +128,8 @@ For example, my neovim example config is in a directory called [neovim](./commun
 If you have the energy to write a README for your config, that's massively appreciated.
 However, it's not expected.
 
+When it comes to contributing to the *rust* side of the project, it's a lot more strict. The design is meant to be simple and minimalistic, so I'm far more cautious of changes to it. So if you don't want to accidentally waste time programming for a project only to be met with a grumpy maintainer, talk to me in a github issue or on discord (`@axlefublr`), so we can figure out whether the change fits the project or not.
+
 # Installation
 
 ```sh
