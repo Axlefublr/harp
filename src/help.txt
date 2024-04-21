@@ -1,0 +1,41 @@
+`harp` is a program that helps store and retrieve paths, stored in registers that are separated by sections.
+
+A section is the highest level key, that stores a bunch of registers inside of it.
+Each register is also a key, but the value of a register is an object, that has the properties path, line, column.
+A register needs to have at least one of those properties filled with data.
+Outside of that, it's up to you which (if not all) of the three a given register will store.
+
+Examples:
+  `harp update marks a --path ~/here/is/my/path --line 23 --column 36`
+  Will store all three properties in the register called "a" (can be any string), under the section called "marks" (can also be any string).
+
+  Important to note: the action is called `update` because it overrides only the properties you pass into it.
+  If a register previously had all three properties set and you do:
+  `harp update marks a --path ~/a/different/path`
+  , then only the path will be updated, while line and column will hold the old value.
+  If you want to clear them, check out the `clear` subcommand explained later in this help page.
+
+  `harp get marks a --path`
+  Will now print "~/here/is/my/path". On the contrary,
+
+  `harp get marks a`
+  Would print the following:
+  ~/here/is/my/path
+  23
+  36
+
+  So if you don't specify any flags for the `get` action, all available properties in a register will be printed, separated by newlines.
+  If you do specify flags, only those properties will be printed.
+  Regardless of whether you did or didn't, the order will always be path, line, column.
+
+  The `clear` subcommand does exactly what you expect it to do.
+  If you only specify the section to `clear` like:
+  `harp clear marks`
+  , the entire section and all its registers will be deleted (be careful!).
+  However, if you specify the register too, only that register's entry will be deleted from the section, while every other register in the section will stay intact.
+  `harp clear marks a`
+
+  If, for example, you want to remove the properties line and column in an entry, and change the path, you would do this:
+  `harp clear marks a`
+  and then:
+  `harp update marks a --path ~/my/new/path`

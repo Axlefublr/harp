@@ -2,7 +2,11 @@ use clap::Parser;
 use clap::Subcommand;
 
 #[derive(Parser)]
+#[command(version, long_about = std::include_str!("help.txt"))]
 pub struct Args {
+    /// Don't print error messages (while still exiting with a non-zero exitcode in case of error).
+    /// Useful for when the program where you want to use `harp` in makes it difficult to
+    /// differentiate between successful stdout and unsuccessful stderr.
     #[arg(short, long)]
     pub quiet:  bool,
     #[command(subcommand)]
@@ -11,30 +15,37 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum Action {
+    /// If REGISTER is specified, it's completely removed.
+    /// If it isn't, the entire SECTION is removed instead.
     Clear {
-        parent: String,
-        child:  Option<String>,
+        section:  String,
+        register: Option<String>,
     },
+    /// Print all available properties of a REGISTER in the order: path, line, column.
+    /// If the `--path`, `--line`, `--column` flags are specified, only those properties are
+    /// printed, still in the same order.
     Get {
-        parent: String,
-        child:  String,
+        section:  String,
+        register: String,
         #[arg(short, long)]
-        path:   bool,
+        path:     bool,
         #[arg(short, long)]
-        line:   bool,
+        line:     bool,
         #[arg(short, long)]
-        column: bool,
+        column:   bool,
     },
+    /// Update properties of a register, or create one.
+    /// At least one of `--path`, `--line`, `--column` has to be specified.
     Update {
-        parent: String,
-        child:  String,
+        section:  String,
+        register: String,
         #[arg(short, long)]
-        path:   Option<String>, // this is not PathBuf…
+        path:     Option<String>, // this is not PathBuf…
         #[arg(short, long)]
-        line:   Option<i32>, // …and this not u32, to let the user abuse `harp` and be able to store
+        line:     Option<i32>, // …and this not u32, to let the user abuse `harp` and be able to store
         // more varied data, for example a relative line or a register of text they want to keep.
         // There's no particular reason we should be storing a string a two numbers anyway.
         #[arg(short, long)]
-        column: Option<i32>,
+        column:   Option<i32>,
     },
 }

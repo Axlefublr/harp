@@ -1,7 +1,9 @@
-use std::{error::Error, path::Path, process::ExitCode};
+use std::error::Error;
 use std::fs::OpenOptions;
 use std::fs::{self};
 use std::io::Write;
+use std::path::Path;
+use std::process::ExitCode;
 
 use clap::Parser;
 
@@ -40,17 +42,17 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
     let mut model: Entries = serde_yaml::from_reader(file)?;
     match action {
         Action::Get {
-            parent,
-            child,
+            section,
+            register,
             path,
             line,
             column,
         } => {
             let entry = model
-                .get(&parent)
-                .ok_or_else(|| format!("couldn't find parent `{}`", parent))?
-                .get(&child)
-                .ok_or_else(|| format!("couldn't find child `{}` under parent `{}`", child, parent))?;
+                .get(&section)
+                .ok_or_else(|| format!("couldn't find parent `{}`", section))?
+                .get(&register)
+                .ok_or_else(|| format!("couldn't find child `{}` under parent `{}`", register, section))?;
             let joined = [
                 entry.path.as_ref().map(|entry_path| {
                     if path {
@@ -82,8 +84,8 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             Ok(())
         },
         Action::Update {
-            parent,
-            child,
+            section: parent,
+            register: child,
             path,
             line,
             column,
@@ -104,7 +106,7 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             }
             save(&model, &harp_data_file)
         },
-        Action::Clear { parent, child } => {
+        Action::Clear { section: parent, register: child } => {
             if let Some(child) = child {
                 if let Some(parent_map) = model.get_mut(&parent) {
                     if parent_map.remove(&child).is_some() {
@@ -130,10 +132,7 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
 }
 
 fn save(model: &Entries, file: &Path) -> Result<(), Box<dyn Error>> {
-    let mut file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(file)?;
+    let mut file = OpenOptions::new().write(true).truncate(true).open(file)?;
     file.write_all(
         serde_yaml::to_string(&model)
             .map_err(|_| "couldn't serialize data model")?
