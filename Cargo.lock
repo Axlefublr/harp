@@ -51,6 +51,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "axleharp"
+version = "0.0.1"
+dependencies = [
+ "clap",
+ "dirs",
+ "serde",
+ "serde_yaml",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -155,16 +165,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
-]
-
-[[package]]
-name = "harp"
-version = "0.0.1"
-dependencies = [
- "clap",
- "dirs",
- "serde",
- "serde_yaml",
 ]
 
 [[package]]

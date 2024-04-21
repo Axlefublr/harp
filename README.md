@@ -21,7 +21,7 @@ Registers are really flexible: `path` doesn't actually have to be a path, it can
 
 Which is exactly where sections come in. You might want to group together a set of related registers, and separate them from other sets, in different sections.
 
-For example, I have a section `__harps`, in which the registers (named as singular letters a-z and A-Z) only have the file path set. So it's a set just file paths, that help me quickly jump to files, but not specific locations in those files.
+For example, I have a section `__harps`, in which the registers (named as singular letters a-z and A-Z) only have the file path set. So it's just a set of file paths, that helps me quickly jump to files, but not specific locations in those files.
 
 I might want to have functionality where I *do* also store the line and number, so I can jump to specific file locations. So, I could name the section that contains them `__location_harps`.
 
@@ -127,3 +127,24 @@ For example, my neovim example config is in a directory called [neovim](./commun
 
 If you have the energy to write a README for your config, that's massively appreciated.
 However, it's not expected.
+
+# Installation
+
+```sh
+cargo install axleharp
+```
+
+`cargo-binstall` and `cargo-quickinstall` are also supported.
+
+Despite the package being called `axleharp`, the binary executable you will be calling is just `harp`.
+
+# Uninstallation
+
+```sh
+cargo uninstall axleharp
+rm -fr ~/.local/share/harp # this is the data file path on linux
+```
+
+For windows, it would look something like: `C:\Users\username\AppData\Local\harp`
+
+For mac: `/Users/username/Library/Application Support/harp`

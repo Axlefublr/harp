@@ -1,13 +1,17 @@
 [package]
-name = "harp"
+name = "axleharp"
 version = "0.0.1"
 edition = "2021"
 authors = ["Axlefublr"]
 license = "MIT"
-description = "File location storer, designed to be called from neovim."
+description = "File location storer, designed to be used from within text editors."
 readme = "README.md"
 homepage = "https://github.com/Axlefublr/harp"
 repository = "https://github.com/Axlefublr/harp"
+
+[[bin]]
+name = "harp"
+path = "src/main.rs"
 
 [lints.rustdoc]
 unescaped_backticks = "deny"
