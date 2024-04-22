@@ -22,8 +22,9 @@ pub enum Action {
         register: Option<String>,
     },
     /// Print all available properties of a REGISTER in the order: path, line, column.
-    /// If the `--path`, `--line`, `--column` flags are specified, only those properties are
-    /// printed, still in the same order.
+    /// Only the properties you specified with the `--path`, `--line`, `--column` flags
+    /// are printed.
+    /// At least one of those flags needs to be specified.
     Get {
         section:  String,
         register: String,

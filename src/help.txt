@@ -16,17 +16,10 @@ Examples:
   If you want to clear them, check out the `clear` subcommand explained later in this help page.
 
   `harp get marks a --path`
-  Will now print "~/here/is/my/path". On the contrary,
+  Will now print "~/here/is/my/path".
 
-  `harp get marks a`
-  Would print the following:
-  ~/here/is/my/path
-  23
-  36
-
-  So if you don't specify any flags for the `get` action, all available properties in a register will be printed, separated by newlines.
-  If you do specify flags, only those properties will be printed.
-  Regardless of whether you did or didn't, the order will always be path, line, column.
+  Whatever flags you specify, only those properties will be printed.
+  The order will always be path, line, column, regardless of the order of flags you specify.
 
   The `clear` subcommand does exactly what you expect it to do.
   If you only specify the section to `clear` like:

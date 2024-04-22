@@ -21,14 +21,14 @@ Registers are really flexible: `path` doesn't actually have to be a path, it can
 
 Which is exactly where sections come in. You might want to group together a set of related registers, and separate them from other sets, in different sections.
 
-For example, I have a section `__harps`, in which the registers (named as singular letters a-z and A-Z) only have the file path set. So it's just a set of file paths, that helps me quickly jump to files, but not specific locations in those files.
+For example, I have a section `harps`, in which the registers (named as singular letters a-z and A-Z) only have the file path set. So it's just a set of file paths, that helps me quickly jump to files, but not specific locations in those files.
 
-I might want to have functionality where I *do* also store the line and number, so I can jump to specific file locations. So, I could name the section that contains them `__location_harps`.
+I might want to have functionality where I *do* also store the line and number, so I can jump to specific file locations. So, I could name the section that contains them `location_harps`.
 
 It only makes sense to separate these two sections, because I want the register names to not be tied together.
-Register "a" in `__harps` might lead to a completely different file than register "a" in `__location_harps`.
+Register "a" in `harps` might lead to a completely different file than register "a" in `location_harps`.
 
-Alternatively, you could use all three properties in `__harps`, and then depending on the hotkey, either just jump to the file, or to the specific location to the file.
+Alternatively, you could use all three properties in `harps`, and then depending on the hotkey, either just jump to the file, or to the specific location to the file.
 
 This sort of flexibility lets you define the behavior that *you* want in your editor (or other program where you want to interactively store and retrieve file paths), and how you use `harp` is up to you.
 
@@ -54,18 +54,10 @@ Examples:
   If you want to clear them, check out the `clear` subcommand explained later in this help page.
 
   `harp get marks a --path`
-  Will now print "~/here/is/my/path". On the contrary,
+  Will now print "~/here/is/my/path".
 
-  `harp get marks a`
-  Would print the following:
-  ~/here/is/my/path
-  23
-  36
-
-  So if you don't specify any flags for the `get` action, all available properties in a register will be printed,
-  separated by newlines.
-  If you do specify flags, only those properties will be printed.
-  Regardless of whether you did or didn't, the order will always be path, line, column.
+  Whatever flags you specify, only those properties will be printed.
+  The order will always be path, line, column, regardless of the order of flags you specify.
 
   The `clear` subcommand does exactly what you expect it to do.
   If you only specify the section to `clear` like:
@@ -85,8 +77,9 @@ Usage: harp [OPTIONS] <COMMAND>
 
 Commands:
   clear   If REGISTER is specified, it's completely removed. If it isn't, the entire SECTION is removed instead
-  get     Print all available properties of a REGISTER in the order: path, line, column. If the `--path`,
-              `--line`, `--column` flags are specified, only those properties are printed, still in the same order
+  get     Print all available properties of a REGISTER in the order: path, line, column.
+              Only the properties you specified with the `--path`, `--line`, `--column` flags are printed.
+              At least one of those flags needs to be specified.
   update  Update properties of a register, or create one. At least one of `--path`, `--line`, `--column` has to
               be specified
   help    Print this message or the help of the given subcommand(s)

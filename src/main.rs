@@ -16,6 +16,8 @@ mod data;
 
 const DATA_FILE: &str = "harp.yml";
 
+const NO_FLAGS_ERROR: &str = "specify at least one of `--path`, `--line`, `--column`";
+
 fn main() -> ExitCode {
     let args = Args::parse();
     if let Err(err) = _main(args.action) {
@@ -48,6 +50,9 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             line,
             column,
         } => {
+            if !path && !line && !column {
+                return Err(NO_FLAGS_ERROR.into());
+            }
             let entry = model
                 .get(&section)
                 .ok_or_else(|| format!("couldn't find parent `{}`", section))?
@@ -76,9 +81,9 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
                     }
                 }),
             ];
-            // We print all available properties of an entry, separated by newlines,
-            // if the user didn't specify the `--path`, `--line`, `--column`
-            // If they did, only those properties are printed, in a predetermined order
+            // Considering that we guaranteed the user specified at *least* one flag,
+            // We print all passed and available properties, in the order of path, line, column.
+            // (Order is the same regardless of the order of flags)
             let result = joined.into_iter().flatten().collect::<Vec<_>>().join("\n");
             print!("{result}");
             Ok(())
@@ -91,7 +96,7 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             column,
         } => {
             if path.is_none() && line.is_none() && column.is_none() {
-                return Err("specify at least one of `--path`, `--line`, `--column`".into());
+                return Err(NO_FLAGS_ERROR.into());
             }
             let parent_entry = model.entry(parent).or_default();
             let child_entry = parent_entry.entry(child).or_default();
@@ -106,7 +111,10 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             }
             save(&model, &harp_data_file)
         },
-        Action::Clear { section: parent, register: child } => {
+        Action::Clear {
+            section: parent,
+            register: child,
+        } => {
             if let Some(child) = child {
                 if let Some(parent_map) = model.get_mut(&parent) {
                     if parent_map.remove(&child).is_some() {
@@ -124,8 +132,10 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
             // wack, since the user might have it under version control.
             // If nothing changed, but there are diffs all over the place, you're more likely to
             // just trust that there was a change, which might not be the case.
-            // I could also use IndexMap to make the diffs clean, but that introduces a dependency.
-            // If you believe it's worth it, open an issue or PR the change directly.
+            // I could also use IndexMap to make the diffs clean, but that introduces a dependency,
+            // and will be slower due to the sorting. Which you would then let the user opt into by
+            // making them specify an environment variable. But all of that doesn't seem worth it.
+            // If you believe it *is*, open an issue or PR the change directly.
             Ok(())
         },
     }
