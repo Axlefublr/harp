@@ -41,12 +41,15 @@ pub enum Action {
         section:  String,
         register: String,
         #[arg(short, long)]
+        #[clap(allow_hyphen_values = true)]
         path:     Option<String>, // this is not PathBuf…
         #[arg(short, long)]
+        #[clap(allow_hyphen_values = true)]
         line:     Option<i32>, // …and this not u32, to let the user abuse `harp` and be able to store
         // more varied data, for example a relative line or a register of text they want to keep.
         // There's no particular reason we should be storing a string a two numbers anyway.
         #[arg(short, long)]
+        #[clap(allow_hyphen_values = true)]
         column:   Option<i32>,
     },
 }
