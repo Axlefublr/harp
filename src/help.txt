@@ -1,9 +1,9 @@
 `harp` is a program that helps store and retrieve paths, stored in registers that are separated by sections.
 
 A section is the highest level key, that stores a bunch of registers inside of it.
-Each register is also a key, but the value of a register is an object, that has the properties path, line, column.
+Each register is also a key, but the value of a register is an object, that has the properties path, line, column, extra.
 A register needs to have at least one of those properties filled with data.
-Outside of that, it's up to you which (if not all) of the three a given register will store.
+Outside of that, it's up to you which (if not all) of the four a given register will store.
 
 Examples:
   `harp update marks a --path ~/here/is/my/path --line 23 --column 36`
@@ -16,7 +16,7 @@ Examples:
   If you want to clear them, check out the `clear` subcommand explained later in this help page.
 
   `harp get marks a --path`
-  Will now print "~/here/is/my/path".
+  Will now print "/home/username/here/is/my/path". (because when you called the command with `~`, your shell expanded it, most likely)
 
   Whatever flags you specify, only those properties will be printed.
   The order will always be path, line, column, regardless of the order of flags you specify.

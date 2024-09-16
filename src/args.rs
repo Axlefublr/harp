@@ -21,8 +21,8 @@ pub enum Action {
         section:  String,
         register: Option<String>,
     },
-    /// Print all available properties of a REGISTER in the order: path, line, column.
-    /// Only the properties you specified with the `--path`, `--line`, `--column` flags
+    /// Print all available properties of a REGISTER in the order: path, line, column, extra.
+    /// Only the properties you specified with the `--path`, `--line`, `--column`, `--extra` flags
     /// are printed.
     /// At least one of those flags needs to be specified.
     Get {
@@ -34,9 +34,11 @@ pub enum Action {
         line:     bool,
         #[arg(short, long)]
         column:   bool,
+        #[arg(short, long)]
+        extra:    bool,
     },
     /// Update properties of a register, or create one.
-    /// At least one of `--path`, `--line`, `--column` has to be specified.
+    /// At least one of `--path`, `--line`, `--column`, `--extra`, has to be specified.
     Update {
         section:  String,
         register: String,
@@ -47,9 +49,14 @@ pub enum Action {
         #[clap(allow_hyphen_values = true)]
         line:     Option<i32>, // …and this not u32, to let the user abuse `harp` and be able to store
         // more varied data, for example a relative line or a register of text they want to keep.
-        // There's no particular reason we should be storing a string a two numbers anyway.
+        // There's no particular reason we should be storing a string and two numbers anyway.
         #[arg(short, long)]
         #[clap(allow_hyphen_values = true)]
         column:   Option<i32>,
+        /// This property is meant as a "random bullshit go" type of information holder.
+        /// Can be very useful if you want to store a path *and* some extra data.
+        #[arg(short, long)]
+        #[clap(allow_hyphen_values = true)]
+        extra:    Option<String>,
     },
 }

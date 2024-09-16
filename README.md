@@ -38,14 +38,15 @@ This sort of flexibility lets you define the behavior that *you* want in your ed
 `harp` is a program that helps store and retrieve paths, stored in registers that are separated by sections.
 
 A section is the highest level key, that stores a bunch of registers inside of it.
-Each register is also a key, but the value of a register is an object, that has the properties path, line, column.
+Each register is also a key, but the value of a register is an object, that has the properties path, line,
+column, extra.
 A register needs to have at least one of those properties filled with data.
-Outside of that, it's up to you which (if not all) of the three a given register will store.
+Outside of that, it's up to you which (if not all) of the four a given register will store.
 
 Examples:
   `harp update marks a --path ~/here/is/my/path --line 23 --column 36`
-  Will store all three properties in the register called "a" (can be any string), under the section called "marks"
-  (can also be any string).
+  Will store all three properties in the register called "a" (can be any string), under the section called
+  "marks" (can also be any string).
 
   Important to note: the action is called `update` because it overrides only the properties you pass into it.
   If a register previously had all three properties set and you do:
@@ -54,7 +55,8 @@ Examples:
   If you want to clear them, check out the `clear` subcommand explained later in this help page.
 
   `harp get marks a --path`
-  Will now print "~/here/is/my/path".
+  Will now print "/home/username/here/is/my/path". (because when you called the command with `~`, your shell
+  expanded it, most likely)
 
   Whatever flags you specify, only those properties will be printed.
   The order will always be path, line, column, regardless of the order of flags you specify.
@@ -63,12 +65,12 @@ Examples:
   If you only specify the section to `clear` like:
   `harp clear marks`
   , the entire section and all its registers will be deleted (be careful!).
-  However, if you specify the register too, only that register's entry will be deleted from the section,
-  while every other register in the section will stay intact.
+  However, if you specify the register too, only that register's entry will be deleted from the section, while
+  every other register in the section will stay intact.
   `harp clear marks a`
 
-  If, for example, you want to remove the properties line and column in an entry, and change the path,
-  you would do this:
+  If, for example, you want to remove the properties line and column in an entry, and change the path, you would
+  do this:
   `harp clear marks a`
   and then:
   `harp update marks a --path ~/my/new/path`
@@ -76,19 +78,20 @@ Examples:
 Usage: harp [OPTIONS] <COMMAND>
 
 Commands:
-  clear   If REGISTER is specified, it's completely removed. If it isn't, the entire SECTION is removed instead
-  get     Print all available properties of a REGISTER in the order: path, line, column.
-              Only the properties you specified with the `--path`, `--line`, `--column` flags are printed.
-              At least one of those flags needs to be specified.
-  update  Update properties of a register, or create one. At least one of `--path`, `--line`, `--column` has to
-              be specified
+  clear   If REGISTER is specified, it's completely removed.
+          If it isn't, the entire SECTION is removed instead.
+  get     Print all available properties of a REGISTER in the order: path, line, column, extra.
+          Only the properties you specified with the `--path`, `--line`, `--column`, `--extra` flags are printed.
+          At least one of those flags needs to be specified.
+  update  Update properties of a register, or create one.
+          At least one of `--path`, `--line`, `--column`, `--extra`, has to be specified.
   help    Print this message or the help of the given subcommand(s)
 
 Options:
   -q, --quiet
           Don't print error messages (while still exiting with a non-zero exitcode in case of error).
-          Useful for when the program where you want to use `harp` in makes it difficult to differentiate between
-          successful stdout and unsuccessful stderr
+          Useful for when the program where you want to use `harp` in makes it difficult to differentiate
+          between successful stdout and unsuccessful stderr.
 
   -h, --help
           Print help (see a summary with '-h')
@@ -121,7 +124,7 @@ For example, my neovim example config is in a directory called [neovim](./commun
 If you have the energy to write a README for your config, that's massively appreciated.
 However, it's not expected.
 
-When it comes to contributing to the *rust* side of the project, it's a lot more strict. The design is meant to be simple and minimalistic, so I'm far more cautious of changes to it. So if you don't want to accidentally waste time programming for a project only to be met with a grumpy maintainer, talk to me in a github issue or on discord (`@axlefublr`), so we can figure out whether the change fits the project or not.
+About the *rust* side though: I'm likely to be the only user of `harp` as a library, so it's not the most flexible. If you need it to be, ask me to improve it in an issue, or improve it on your own in a PR.
 
 # Installation
 
