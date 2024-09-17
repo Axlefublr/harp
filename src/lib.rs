@@ -108,7 +108,7 @@ impl HarpReady {
     /// The section needs to exist, and the register needs to exist;
     /// Otherwise you get an Err().
     pub fn get(
-        &mut self,
+        &self,
         section: &str,
         register: &str,
         path: bool,
