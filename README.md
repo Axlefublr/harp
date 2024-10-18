@@ -8,7 +8,7 @@ Harp uses "sections" to store a bunch of "registers".
 
 A register is what actually holds a singular file location.
 
-A register can have the following properties: path, line, column.
+A register can have the following properties: path, line, column, extra.
 
 You don't have to use all of them! But you do have to use at least one of them.
 
@@ -16,7 +16,8 @@ The idea behind those 3 properties, is that you can keep all the information you
 
 On your editor's side, you would make hotkeys to update a register's information, and to get a register's information (and somehow use it, usually by travelling to the stored file location).
 
-Registers are really flexible: `path` doesn't actually have to be a path, it can be any string.
+Registers are really flexible: `path` doesn't actually have to be a path, it can be any string. \
+`extra` is another string field that you can use, if `path` is already taken by something else. \
 `line` and `column`, on the other hand, need to be integers. And let me repeat myself: you don't have to use all three, you can mix and match the properties that you need.
 
 Which is exactly where sections come in. You might want to group together a set of related registers, and separate them from other sets, in different sections.
@@ -78,20 +79,20 @@ Examples:
 Usage: harp [OPTIONS] <COMMAND>
 
 Commands:
-  clear   If REGISTER is specified, it's completely removed.
-          If it isn't, the entire SECTION is removed instead.
-  get     Print all available properties of a REGISTER in the order: path, line, column, extra.
-          Only the properties you specified with the `--path`, `--line`, `--column`, `--extra` flags are printed.
-          At least one of those flags needs to be specified.
-  update  Update properties of a register, or create one.
-          At least one of `--path`, `--line`, `--column`, `--extra`, has to be specified.
+  clear   If REGISTER is specified, it's completely removed. If it isn't, the entire SECTION is removed
+              instead
+  get     Print all available properties of a REGISTER in the order: path, line, column, extra. Only the
+              properties you specified with the `--path`, `--line`, `--column`, `--extra` flags are printed. At
+              least one of those flags needs to be specified
+  update  Update properties of a register, or create one. At least one of `--path`, `--line`, `--column`,
+              `--extra`, has to be specified
   help    Print this message or the help of the given subcommand(s)
 
 Options:
   -q, --quiet
-          Don't print error messages (while still exiting with a non-zero exitcode in case of error).
-          Useful for when the program where you want to use `harp` in makes it difficult to differentiate
-          between successful stdout and unsuccessful stderr.
+          Don't print error messages (while still exiting with a non-zero exitcode in case of error). Useful for
+          when the program where you want to use `harp` in makes it difficult to differentiate between
+          successful stdout and unsuccessful stderr
 
   -h, --help
           Print help (see a summary with '-h')
