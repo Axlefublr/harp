@@ -55,9 +55,9 @@ fn _main(action: Action) -> Result<(), Box<dyn Error>> {
                         Default::default()
                     }
                 }),
-                entry.extra.as_ref().map(|entry_column| {
-                    if column {
-                        entry_column.to_string()
+                entry.extra.as_ref().map(|entry_extra| {
+                    if extra {
+                        entry_extra.to_string()
                     } else {
                         Default::default()
                     }
