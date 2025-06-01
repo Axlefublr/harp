@@ -1,118 +1,65 @@
 # Harp
 
-> I usually have taglines here, but I haven't come up with one yet.
+The idea behind this program will be explained in an upcoming blog post.
 
-Harp is a path storage and retrieval system, designed to store file locations to be used by various text editors (or any other program).
+Harp exists to be a convenient and simple abstraction over getting and setting data. \
+The idea is to use harp within your text editor, as well as other tools like file managers, your shell, global hotkeys, and honestly whatever else you may come up with.
 
-Harp uses "sections" to store a bunch of "registers".
+The simplest example is a file harp (a "harp action"). \
+You have a hotkey in your editor to *set* a file harp — setting a file harp takes the filepath of the current buffer that you're editing, and stores it in a harp. \
+You have another hotkey that *gets* a file harp — getting a file harp takes the filepath that you already stored in a harp previously, and uses it somehow: for example, by opening the stored filepath.
 
-A register is what actually holds a singular file location.
+This simple idea can be expanded upon in really powerful ways! Check out [my helix fork](https://github.com/Axlefublr/helix) to see what a harp implementation may look like.
 
-A register can have the following properties: path, line, column, extra.
+On the top level of the harp data model, are "sections". \
+Each section exists to be a namespace for every harp action you may want to implement. \
+You have a section called `harp_files` for your file harps, section `harp_searches` for your search harps, `harp_marks` for your vim-like mark harps, etc.
 
-You don't have to use all of them! But you do have to use at least one of them.
+On the second level are "registers". \
+Registers are keys inside of each section, and in the context of a harp implementation for an editor, registers are generally either user's input, or a singular key, or maybe a singular representation of a hotkey. \
+Effectively, a harp action tends to ask the user for input, and their input becomes a register name, inside of a section.
+A harp implementation can quickly lose its usefulness if the user has to avoid naming conflicts: my design idea of how to *use* harp is to exclusively use single character keys / hotkeys. \
+Sections exist to allow for such a workflow — each harp action is namespaced / separated from the others, so that the user can use the same very short register names for multiple different harp actions, and have no conflicts.
 
-The idea behind those 3 properties, is that you can keep all the information you need to store a specific location inside of a file.
+On the third level is a "harp". \
+A harp is what a register holds, and it's an array of strings. \
+While it's an array of strings, they may actually be all sorts of different values! \
+For example, you may want to store a filepath, a regex (to store a search), a number (to store a line / column / byte position), a command to be executed in command mode of helix/kakoune/nvim. \
+In most of my usecases, I simply store a single value, but since a harp is an array, you can store as many values as you need to accomplish your usecase.
 
-On your editor's side, you would make hotkeys to update a register's information, and to get a register's information (and somehow use it, usually by travelling to the stored file location).
+This can feel unstable at first glance, but in practice this ends up being a non-issue. \
+You *get* a harp after you have *set* it, with an action that will consistently put the amount and type of values that you expect. \
+So either a harp is empty (you haven't set it) or it's valid (you have), making for a good enough user and developer experience, considering the flexibility I'm trying to reach for here.
 
-Registers are really flexible: `path` doesn't actually have to be a path, it can be any string. \
-`extra` is another string field that you can use, if `path` is already taken by something else. \
-`line` and `column`, on the other hand, need to be integers. And let me repeat myself: you don't have to use all three, you can mix and match the properties that you need.
+You might now ask: "Why use this program at all? Can't I just work with the json myself?" \
+Sometimes you can, sometimes you can't. How expressive the configuration of a program you're trying to implement harp into depends, and whether it lets you painlessly work with hashmaps or not is a question.
 
-Which is exactly where sections come in. You might want to group together a set of related registers, and separate them from other sets, in different sections.
+Neovim: you can hold maps at runtime, but serializing/deserializing into a file so that harps are actually persistent across sessions is a pain. \
+Fish shell: you straight up don't have maps. \
+Yazi: same lua issue as with neovim. \
+Helix: the current configuration config is not nearly expressive enough to implement harps at all, and that's why I forked it. In the rust source code I of course can interact with maps and deserialize/serialize into a file, but see below point. \
+Nushell: sure you can yeah. but see below point.
 
-For example, I have a section `harps`, in which the registers (named as singular letters a-z and A-Z) only have the file path set. So it's just a set of file paths, that helps me quickly jump to files, but not specific locations in those files.
-
-I might want to have functionality where I *do* also store the line and number, so I can jump to specific file locations. So, I could name the section that contains them `location_harps`.
-
-It only makes sense to separate these two sections, because I want the register names to not be tied together.
-Register "a" in `harps` might lead to a completely different file than register "a" in `location_harps`.
-
-Alternatively, you could use all three properties in `harps`, and then depending on the hotkey, either just jump to the file, or to the specific location to the file.
-
-This sort of flexibility lets you define the behavior that *you* want in your editor (or other program where you want to interactively store and retrieve file paths), and how you use `harp` is up to you.
+Some places where you may want harps will allow you to implement them, some straight up won't. \
+Dealing with whether you even can is already a deal-breaker, but even if you manage to implement the functionality into every program, that's so much work! \
+What if instead you had some standard abstraction that helped you interact with the data, and only have to figure out how to supply/use it in each implementation? Wouldn't that be much easier? \
+That's exactly the role that harp fills.
 
 # Usage
 
-```
-`harp` is a program that helps store and retrieve paths, stored in registers that are separated by sections.
+This program is both a cli and a library. \
+For most programs you'll likely call the cli as an external command, and use the data it prints to stdout in some way. \
+For programs where you can use rust (if you're forking helix or yazi or the like), use harp as a library to interact with the data in a much easier to reason about way, with harp still dealing with all the json shenanigans for you, and you simply get or set the values. \
+Check the crate's documentation to learn how to use harp on the library side, check the `--help` page of the harp binary to learn how to use it on the cli side. \
+This readme exists to fill you in on the high-level design of harp as an idea.
 
-A section is the highest level key, that stores a bunch of registers inside of it.
-Each register is also a key, but the value of a register is an object, that has the properties path, line,
-column, extra.
-A register needs to have at least one of those properties filled with data.
-Outside of that, it's up to you which (if not all) of the four a given register will store.
+# Harp implementations
 
-Examples:
-  `harp update marks a --path ~/here/is/my/path --line 23 --column 36`
-  Will store all three properties in the register called "a" (can be any string), under the section called
-  "marks" (can also be any string).
+Harp exists to be used within text editors, file managers, shells, global hotkeys, and basically literally anything. \
+Because of this flexibility, no actual *behavior* is implemented by `harp` — it's not its responsibility. It's the responsibility of the user to decide *how* they use the data they store using `harp`. \
+To discover and share how you use harp in various programs, check out [community](./community/).
 
-  Important to note: the action is called `update` because it overrides only the properties you pass into it.
-  If a register previously had all three properties set and you do:
-  `harp update marks a --path ~/a/different/path`
-  , then only the path will be updated, while line and column will hold the old value.
-  If you want to clear them, check out the `clear` subcommand explained later in this help page.
-
-  `harp get marks a --path`
-  Will now print "/home/username/here/is/my/path". (because when you called the command with `~`, your shell
-  expanded it, most likely)
-
-  Whatever flags you specify, only those properties will be printed.
-  The order will always be path, line, column, regardless of the order of flags you specify.
-
-  The `clear` subcommand does exactly what you expect it to do.
-  If you only specify the section to `clear` like:
-  `harp clear marks`
-  , the entire section and all its registers will be deleted (be careful!).
-  However, if you specify the register too, only that register's entry will be deleted from the section, while
-  every other register in the section will stay intact.
-  `harp clear marks a`
-
-  If, for example, you want to remove the properties line and column in an entry, and change the path, you would
-  do this:
-  `harp clear marks a`
-  and then:
-  `harp update marks a --path ~/my/new/path`
-
-Usage: harp [OPTIONS] <COMMAND>
-
-Commands:
-  clear   If REGISTER is specified, it's completely removed. If it isn't, the entire SECTION is removed
-              instead
-  get     Print all available properties of a REGISTER in the order: path, line, column, extra. Only the
-              properties you specified with the `--path`, `--line`, `--column`, `--extra` flags are printed. At
-              least one of those flags needs to be specified
-  update  Update properties of a register, or create one. At least one of `--path`, `--line`, `--column`,
-              `--extra`, has to be specified
-  help    Print this message or the help of the given subcommand(s)
-
-Options:
-  -q, --quiet
-          Don't print error messages (while still exiting with a non-zero exitcode in case of error). Useful for
-          when the program where you want to use `harp` in makes it difficult to differentiate between
-          successful stdout and unsuccessful stderr
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
-```
-
-# Integration with text editors
-
-`harp`'s idea initially comes from the neovim plugin [Harpoon](https://github.com/ThePrimeagen/harpoon), which is written in a surprisingly inflexible way.
-
-`harp` was initially meant to be a neovim plugin as well, but I despise lua, so that's the reason it's written in rust, and has the benefit of being usable for any program (that can call shell commands from within).
-
-So because of this flexibility, no actual *behavior* is implemented by `harp` — it's not its responsibility. It's the responsibility of the user to decide *how* they use the data they store using `harp`.
-
-It's still very useful to see real life examples of using `harp` in various editors and programs, and that's what [community](./community/) is for!
-
-Since I initially made this program for neovim, I leave an example of how I use `harp` in there.
-If you found `harp` useful, feel free to open a PR to add your example config to [community](./community/)!
+I share some implementations there, and implore that you do too: if you made a harp implementaton for some program, feel free to pr it into community!
 
 # Contributing
 
@@ -120,12 +67,12 @@ The only ask for contributions to [community](./community/), is that they should
 
 The file structure (if there is more than one file), file naming conventions, as well as formatting, is up to you!
 Just make sure to contain your config under a directory, named accordingly.
-For example, my neovim example config is in a directory called [neovim](./community/neovim/)
+For example, the neovim plugin is in a directory called [neovim](./community/neovim/)
 
 If you have the energy to write a README for your config, that's massively appreciated.
 However, it's not expected.
 
-About the *rust* side though: I'm likely to be the only user of `harp` as a library, so it's not the most flexible. If you need it to be, ask me to improve it in an issue, or improve it on your own in a PR.
+About the *rust* side though: I'm open to contributions, however I don't want to waste your energy — ask me in an issue about your idea, before spend your precious time working on it, only to realize that it's not going to be accepted (potentially).
 
 # Installation
 
