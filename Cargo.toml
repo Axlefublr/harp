@@ -17,7 +17,9 @@ path = "src/main.rs"
 unescaped_backticks = "deny"
 
 [dependencies]
+anyhow = "1.0.98"
 clap = { version = "4.5.4", features = ["wrap_help", "derive"] }
 dirs = "5.0.1"
 serde = { version = "1.0.198", features = ["derive"] }
-serde_yaml = "0.9.34"
+serde_json = "1.0.140"
+thiserror = "2.0.12"

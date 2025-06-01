@@ -1,7 +1,7 @@
-use std::error::Error;
 use std::process::ExitCode;
 
-use axleharp::HarpReady;
+use anyhow::ensure;
+use axleharp::HarpConnection;
 use clap::Parser;
 
 use crate::args::Action;
@@ -21,63 +21,35 @@ fn main() -> ExitCode {
     }
 }
 
-fn _main(action: Action) -> Result<(), Box<dyn Error>> {
-    let mut harp = HarpReady::build()?;
+fn _main(action: Action) -> anyhow::Result<()> {
+    let mut harp = HarpConnection::build()?;
     match action {
         Action::Get {
             section,
             register,
-            path,
-            line,
-            column,
-            extra,
+            null,
         } => {
-            let entry = harp.get(&section, &register, path, line, column, extra)?;
-            let joined = [
-                entry.path.as_ref().map(|entry_path| {
-                    if path {
-                        entry_path.to_owned()
-                    } else {
-                        Default::default()
-                    }
-                }),
-                entry.line.map(|entry_line| {
-                    if line {
-                        entry_line.to_string()
-                    } else {
-                        Default::default()
-                    }
-                }),
-                entry.column.map(|entry_column| {
-                    if column {
-                        entry_column.to_string()
-                    } else {
-                        Default::default()
-                    }
-                }),
-                entry.extra.as_ref().map(|entry_extra| {
-                    if extra {
-                        entry_extra.to_string()
-                    } else {
-                        Default::default()
-                    }
-                }),
-            ];
-            // Considering that we guaranteed the user specified at *least* one flag,
-            // We print all passed and available properties, in the order of path, line, column, extra.
-            // (Order is the same regardless of the order of flags)
-            let result = joined.into_iter().flatten().collect::<Vec<_>>().join("\n");
-            print!("{result}");
-            Ok(())
+            let values = harp.entry_mut(section.clone(), register.clone());
+            ensure!(
+                !values.is_empty(),
+                "section `{section}` register `{register}` is empty"
+            );
+            if null {
+                print!("{}", values.join("\0"));
+            } else {
+                println!("{}", values.join("\n"));
+            }
         },
-        Action::Update {
+        Action::Replace {
             section,
             register,
-            path,
-            line,
-            column,
-            extra,
-        } => harp.update(section, register, path, line, column, extra),
-        Action::Clear { section, register } => harp.clear(section, register),
+            mut values,
+        } => {
+            let old_values = harp.entry_mut(section, register);
+            old_values.clear();
+            old_values.append(&mut values);
+            harp.save()?;
+        },
     }
+    Ok(())
 }
