@@ -1,6 +1,10 @@
-//! Create a [`HarpConnection`] using [`HarpConnection::build`] — this ensures the data file is created, and is valid json that you can modify.
+//! Create a [`HarpConnection`] using [`HarpConnection::build`] — this ensures the data file is created, and is valid json that you can modify. \
 //! Then, use [`HarpConnection::entry_mut`] to get a mutable reference to the vector of the register that you want to interact with.
 //! Do all the changes you want to do, and call [`HarpConnection::save`]. This will write the model back into the json data file.
+//!
+//! If you don't intend to *modify* the data, you can instead use [`HarpConnection::entry_ref`].
+//!
+//! `entry_` methods are for looking into some specific register; but if you want to mutate / view *all* the registers in a section, use [`HarpConnection::section_mut`] / [`HarpConnection::section_ref`]
 
 use std::fs;
 use std::fs::OpenOptions;
@@ -17,12 +21,14 @@ const DATA_FILE: &str = "harp.jsonc";
 pub type Entries = HashMap<String, HashMap<String, Vec<String>>>;
 pub type Result<T> = std::result::Result<T, Error>;
 
+#[derive(Clone)]
 pub struct HarpConnection {
     data_path: PathBuf,
     entries: Entries,
 }
 
 impl HarpConnection {
+    /// Create the harp data directory and data file, read it and deserialize it into the model.
     pub fn build() -> Result<Self> {
         let data_dir = dirs::data_local_dir().ok_or(Error::MissingLocalDataDirectory)?;
         let harp_data_dir = data_dir.join(PROGRAM_NAME);
@@ -49,7 +55,8 @@ impl HarpConnection {
         Ok(Self { data_path, entries })
     }
 
-    /// Remember to call this at the end of all of your harp operations
+    /// Remember to call this at the end of your mutating harp operations.
+    /// If you only ever just look at the data rather than modify it, no need to call this.
     pub fn save(self) -> Result<()> {
         let mut file = OpenOptions::new()
             .write(true)
@@ -65,6 +72,13 @@ impl HarpConnection {
         Ok(())
     }
 
+    /// Get a reference to the `Vec` of your desired register, but only if both the section and the register already exist.
+    pub fn entry_ref(&self, section: &str, register: &str) -> Option<&Vec<String>> {
+        self.entries
+            .get(section)
+            .and_then(|the| the.get(register))
+    }
+
     /// Get a mutable reference to the `Vec` of your desired register, creating the section and the register in the process, if necessary.
     pub fn entry_mut(&mut self, section: String, register: String) -> &mut Vec<String> {
         let section_entry = self
@@ -73,6 +87,19 @@ impl HarpConnection {
             .or_default();
         section_entry
             .entry(register)
+            .or_default()
+    }
+
+    /// Get a reference to the `HashMap` of all the registers in this section, if it even exists.
+    /// If the section doesn't exist, it is **not** created, unlike with `section_mut()`.
+    pub fn section_ref(&self, section: &str) -> Option<&HashMap<String, Vec<String>>> {
+        self.entries.get(section)
+    }
+
+    /// Get a mutable reference to the `HashMap` of all the registers in this section, creating the section if necessary.
+    pub fn section_mut(&mut self, section: String) -> &mut HashMap<String, Vec<String>> {
+        self.entries
+            .entry(section)
             .or_default()
     }
 }
