@@ -3,10 +3,12 @@
 The idea behind this program is explained in [this blog post](https://axlefublr.github.io/harp/).
 
 Harp exists to be a convenient and unified interface for getting and setting data. \
-The model is a map of maps of arrays (`HashMap<String, HashMap<String, Vec<String>>>`). \
+The model is a map of maps of arrays (`HashMap<String, HashMap<String, Vec<String>>>`¹). \
 The keys in the lower lever map are called “registers” — they are meant to be user input in some way; either they enter it in a prompt, or each key is a representation of a keyboard key the user presses. \
 Registers are what actually holds the data that you want to store. \
 The keys in the *top* level map are called “sections” — they help you keep each usecase separate, so that the registers do not collide.
+
+¹ Well, `IndexMap` actually — the order of the entries in the data file is consistent
 
 You can interact with a harp (i.e. register + the data it holds) with two actions: get and set (replace). \
 Get gives you the stored strings, that you can use in whatever way.

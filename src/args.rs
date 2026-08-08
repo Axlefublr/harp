@@ -7,8 +7,6 @@ use clap::Subcommand;
 #[command(version)]
 pub struct Args {
     /// Don't print error messages (while still exiting with a non-zero exitcode in case of error).
-    /// Useful for when the program where you want to use `harp` in makes it difficult to
-    /// differentiate between successful stdout and unsuccessful stderr.
     #[arg(short, long)]
     pub quiet: bool,
     #[command(subcommand)]

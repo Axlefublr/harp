@@ -1,3 +1,2 @@
-Only the library side was updated. \
-Three new methods on `HarpConnection`: `entry_ref`, `section_mut`, `section_ref`. \
-Thanks to the `section_` methods, you can now conveniently implement some sort of ui that shows you the contents of registers before you would use them.
+`IndexMap` is now used instead of `HashMap`, and thanks to that the order of the entries in your data file is always consistent, so you can totally blammo some sort of wrapper that git commits whenever you invoke harp, so that you could easily revert to an earlier history point. \
+This is a major bump because this does change the return types on the library side; if you're just the cli user, this isn't really a major bump

@@ -1,6 +1,6 @@
 [package]
 name = "axleharp"
-version = "3.1.0"
+version = "4.0.0"
 edition = "2021"
 authors = ["Axlefublr"]
 license = "MIT"
@@ -20,6 +20,7 @@ unescaped_backticks = "deny"
 anyhow = "1.0.98"
 clap = { version = "4.5.4", features = ["wrap_help", "derive"] }
 dirs = "5.0.1"
+indexmap = { version = "2.14.0", features = ["serde"] }
 serde = { version = "1.0.198", features = ["derive"] }
 serde_json = "1.0.140"
 thiserror = "2.0.12"

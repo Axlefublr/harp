@@ -8,9 +8,11 @@
 
 use std::fs;
 use std::fs::OpenOptions;
+use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
-use std::{collections::HashMap, io::Read};
+
+use indexmap::IndexMap;
 
 mod error;
 pub use error::Error;
@@ -18,7 +20,7 @@ pub use error::Error;
 const PROGRAM_NAME: &str = "harp";
 const DATA_FILE: &str = "harp.jsonc";
 
-pub type Entries = HashMap<String, HashMap<String, Vec<String>>>;
+pub type Entries = IndexMap<String, IndexMap<String, Vec<String>>>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Clone)]
@@ -90,14 +92,14 @@ impl HarpConnection {
             .or_default()
     }
 
-    /// Get a reference to the `HashMap` of all the registers in this section, if it even exists.
+    /// Get a reference to the `IndexMap` of all the registers in this section, if it even exists.
     /// If the section doesn't exist, it is **not** created, unlike with `section_mut()`.
-    pub fn section_ref(&self, section: &str) -> Option<&HashMap<String, Vec<String>>> {
+    pub fn section_ref(&self, section: &str) -> Option<&IndexMap<String, Vec<String>>> {
         self.entries.get(section)
     }
 
-    /// Get a mutable reference to the `HashMap` of all the registers in this section, creating the section if necessary.
-    pub fn section_mut(&mut self, section: String) -> &mut HashMap<String, Vec<String>> {
+    /// Get a mutable reference to the `IndexMap` of all the registers in this section, creating the section if necessary.
+    pub fn section_mut(&mut self, section: String) -> &mut IndexMap<String, Vec<String>> {
         self.entries
             .entry(section)
             .or_default()
